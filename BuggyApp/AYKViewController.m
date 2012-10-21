@@ -29,17 +29,42 @@ static NSString *const DELIMETER = @" ";
 }
 
 - (IBAction)sortButtonPress:(id)sender {
+    
+    BOOL badInput = NO;
+    
     NSString* inputString = self.inputField.text;
+    
+    // user put nothing: bad input
+    if ([self.inputField.text isEqualToString:@""]) {
+        badInput = YES;
+    }
+    
+    
     NSArray *numberStrings = [inputString componentsSeparatedByString:DELIMETER];
     NSMutableArray *numbers = [NSMutableArray array];
     
     for (NSString *numberString in numberStrings) {
+        // take care of a bunch of spaces
+        if ([numberString isEqualToString:@""]){
+            continue;
+        }
         NSInteger number = [numberString intValue];
+        // take care of all cases where we don't just have one digit 0-9
+        if (![numberString isEqualToString:[NSString stringWithFormat:@"%d", number]]){
+            badInput = YES;
+            break;
+        }
         [numbers addObject: [NSNumber numberWithInt:number]];
     }
-
+    
     NSArray *sorted = [numbers sortedArrayUsingSelector:@selector(compare:)];
-    [self updateOutputField:sorted];
+    
+    if (badInput) {
+        self.outputField.text = @"Error: Bad Input :(";
+        return;
+    }
+    else
+        [self updateOutputField:sorted];
 }
 
 - (void) updateOutputField:(NSArray *)sorted {
